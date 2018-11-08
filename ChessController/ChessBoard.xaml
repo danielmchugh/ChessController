@@ -15,7 +15,7 @@
         <UniformGrid Rows="8" Columns="8" Opacity=".5"
                      x:Name="SquaresGrid"/>
 
-        <ItemsControl ItemsSource="{Binding Pieces}">
+        <ItemsControl ItemsSource="{Binding ChessPieces}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid IsItemsHost="True">

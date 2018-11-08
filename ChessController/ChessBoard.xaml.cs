@@ -3,6 +3,9 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Linq;
+using ChessDotNet;
+using System.Diagnostics;
+using ChessController;
 
 namespace DanielMcHugh.AI.ChessBoard
 { 
@@ -11,15 +14,23 @@ namespace DanielMcHugh.AI.ChessBoard
         private const int RowCount = 8;
         private const int ColCount = 8;
 
-        public ObservableCollection<ChessPiece> Pieces { get; set; }
+        public static ChessGame Game { get; set; }
+
+        public ObservableCollection<ChessPiece> ChessPieces { get; set; }
 
         public ChessBoard()
         {
-            Pieces = new ObservableCollection<ChessPiece>();
+            ChessPieces = new ObservableCollection<ChessPiece>();
+            Game = new ChessGame();
+
             InitializeComponent();
             DataContext = this;
             CreateBoard();
-            NewGame();
+            SetupBoard();
+
+            ChessPieces[24].AttemptMove(File.A, 4);
+            ChessPieces[8].AttemptMove(File.A, 6);
+
         }
 
         private void CreateBoard()
@@ -36,16 +47,16 @@ namespace DanielMcHugh.AI.ChessBoard
             }
         }
 
-        private void NewGame()
+        private void SetupBoard()
         {
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 0, Type = ChessPieceTypes.Tower, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 1, Type = ChessPieceTypes.Knight, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 2, Type = ChessPieceTypes.Bishop, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 3, Type = ChessPieceTypes.Queen, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 4, Type = ChessPieceTypes.King, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 5, Type = ChessPieceTypes.Bishop, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 6, Type = ChessPieceTypes.Knight, IsBlack = true });
-            Pieces.Add(new ChessPiece() { Row = 0, Column = 7, Type = ChessPieceTypes.Tower, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 0, Type = ChessPieceTypes.Tower, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 1, Type = ChessPieceTypes.Knight, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 2, Type = ChessPieceTypes.Bishop, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 3, Type = ChessPieceTypes.Queen, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 4, Type = ChessPieceTypes.King, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 5, Type = ChessPieceTypes.Bishop, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 6, Type = ChessPieceTypes.Knight, IsBlack = true });
+            ChessPieces.Add(new ChessPiece() { Row = 0, Column = 7, Type = ChessPieceTypes.Tower, IsBlack = true });
 
             Enumerable
                 .Range(0, 8)
@@ -57,16 +68,16 @@ namespace DanielMcHugh.AI.ChessBoard
                     Type = ChessPieceTypes.Pawn
                 })
                 .ToList()
-                .ForEach(Pieces.Add);
+                .ForEach(ChessPieces.Add);
 
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 0, Type = ChessPieceTypes.Tower, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 1, Type = ChessPieceTypes.Knight, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 2, Type = ChessPieceTypes.Bishop, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 3, Type = ChessPieceTypes.Queen, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 4, Type = ChessPieceTypes.King, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 5, Type = ChessPieceTypes.Bishop, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 6, Type = ChessPieceTypes.Knight, IsBlack = false });
-            Pieces.Add(new ChessPiece() { Row = 7, Column = 7, Type = ChessPieceTypes.Tower, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 0, Type = ChessPieceTypes.Tower, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 1, Type = ChessPieceTypes.Knight, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 2, Type = ChessPieceTypes.Bishop, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 3, Type = ChessPieceTypes.Queen, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 4, Type = ChessPieceTypes.King, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 5, Type = ChessPieceTypes.Bishop, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 6, Type = ChessPieceTypes.Knight, IsBlack = false });
+            ChessPieces.Add(new ChessPiece() { Row = 7, Column = 7, Type = ChessPieceTypes.Tower, IsBlack = false });
 
             Enumerable.Range(0, 8).Select(x => new ChessPiece()
             {
@@ -74,7 +85,12 @@ namespace DanielMcHugh.AI.ChessBoard
                 Column = x,
                 IsBlack = false,
                 Type = ChessPieceTypes.Pawn
-            }).ToList().ForEach(Pieces.Add);
+            }).ToList().ForEach(ChessPieces.Add);
+
+            foreach (var piece in ChessPieces)
+            {
+                piece.Init();
+            }
 
         }
     }
