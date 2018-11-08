@@ -28,6 +28,7 @@ namespace DanielMcHugh.AI.ChessBoard
             CreateBoard();
             SetupBoard();
 
+            //Testing piece moves
             ChessPieces[24].AttemptMove(File.A, 4);
             ChessPieces[8].AttemptMove(File.A, 6);
 

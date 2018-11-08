@@ -8,10 +8,13 @@ namespace DanielMcHugh.AI.ChessBoard
 {
     public class ChessPiece : INotifyPropertyChanged
     {
+        private bool _isBlack;
         public bool IsBlack { get => _isBlack; set => _isBlack = value; }
 
+        private ChessPieceTypes _type;
         public ChessPieceTypes Type { get => _type; set => _type = value; }
 
+        private Piece _localPiece;
         public Piece LocalPiece { get => _localPiece; set => _localPiece = value; }
 
         private File file;
@@ -40,10 +43,6 @@ namespace DanielMcHugh.AI.ChessBoard
         }
 
         private int _column;
-        private Piece _localPiece;
-        private ChessPieceTypes _type;
-        private bool _isBlack;
-
         public int Column
         {
             get
@@ -66,9 +65,6 @@ namespace DanielMcHugh.AI.ChessBoard
                 return Helper.BoardLocations[Column, Row];
             }
         }
-
-
-
 
         public bool AttemptMove(File file, int rank)
         {
